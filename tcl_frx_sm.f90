@@ -1,20 +1,22 @@
-submodule (reInterface) reInterface_sm
+submodule (tcl_frx) tcl_frx_sm
     implicit none
 
 contains
-
-    ! ----------------------------------------------------------------
+! ----------------------------------------------------------------
     ! Object procedures
     ! ----------------------------------------------------------------
 
+    module procedure assign_regex_t
+        error stop 'regex_t: assignment is not supported'
+    end procedure assign_regex_t
+
     module procedure close_regex_t
         call this%delete
-        print *, '<final>'
     end procedure close_regex_t
 
     module procedure delete_regex_t
         call tcl_re_delete_f(this%h)
-        print *, '<deleted>'
+        this%h = -1
     end procedure delete_regex_t
 
     module procedure compile_regex_t
@@ -111,4 +113,4 @@ contains
         h  = int(ch)
     end procedure tcl_re_delete_f
 
-end submodule reInterface_sm
+end submodule tcl_frx_sm

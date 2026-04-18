@@ -18,10 +18,10 @@ ifdef intel
     # COPTS:    flags for our own tclInterface.c (with -Wall)
     RE_COPTS := -I re_engine -I utf8proc -DUTF8PROC_STATIC
     COPTS    := $(RE_COPTS) -Wall
-    FOPTS    := -fPIC -fpp -module $(ODIR) -I$(ODIR)
+    FOPTS    := -fPIC -fpp -module $(ODIR) -I$(ODIR) -diag-disable=7712
     ifdef release
-        RE_COPTS += -O2 -xHost
-        COPTS    += -O2 -xHost
+        RE_COPTS += -O2
+        COPTS    += -O2
         FOPTS    += -O3 -xHost -fp-model precise -warn all
     else
         RE_COPTS += -g
@@ -65,8 +65,8 @@ UTF_SRCS := $(UTF_DIR)/utf8proc.c
 RE_OBJS  := $(addprefix $(ODIR)/, $(notdir $(RE_SRCS:.c=.o)))
 UTF_OBJS := $(addprefix $(ODIR)/, $(notdir $(UTF_SRCS:.c=.o)))
 C_OBJS   := $(RE_OBJS) $(UTF_OBJS) $(ODIR)/tclInterface.o
-F_OBJ    := $(ODIR)/tclInterface_f.o
-F_SM_OBJ := $(ODIR)/tclInterface_sm.o
+F_OBJ    := $(ODIR)/tcl_frx.o
+F_SM_OBJ := $(ODIR)/tcl_frx_sm.o
 LIB      := $(ODIR)/libtclInterface.a
 
 # -----------------------------------------------------------------------
@@ -77,13 +77,16 @@ all: $(ODIR) re_utest_f
 re_utest_f: re_utest.f90 $(LIB)
 	$(FC) $(FOPTS) -o $@ re_utest.f90 $(LIB) $(LINK_OPTS) -lpthread -lm -ldl
 
+example: example.f90 $(LIB)
+	$(FC) $(FOPTS) -o $@ example.f90 $(LIB) $(LINK_OPTS) -lpthread -lm -ldl
+
 $(LIB): $(C_OBJS) $(F_OBJ) $(F_SM_OBJ)
 	ar rcv $@ $^
 
-$(F_OBJ): tclInterface.f90 | $(ODIR)
+$(F_OBJ): tcl_frx.f90 | $(ODIR)
 	$(FC) $(FOPTS) -c $< -o $@
 
-$(F_SM_OBJ): tclInterface_sm.f90 $(F_OBJ)
+$(F_SM_OBJ): tcl_frx_sm.f90 $(F_OBJ)
 	$(FC) $(FOPTS) -c $< -o $@
 
 $(ODIR)/tclInterface.o: tclInterface.c | $(ODIR)
@@ -99,7 +102,7 @@ $(ODIR):
 	mkdir -p $(ODIR)
 
 clean:
-	@$(RM) -vr $(ODIR) re_utest_f *.mod
+	@$(RM) -vr $(ODIR) re_utest_f example *.mod
 
 veryclean: clean
 	@$(RM) -rvf obj_*

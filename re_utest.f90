@@ -1,5 +1,5 @@
 program re_utest
-  use reInterface
+  use tcl_frx
   implicit none
 
   type(regex_t) :: rx1

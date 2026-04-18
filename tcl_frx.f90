@@ -1,5 +1,5 @@
 !
-! reInterface -- Modern Fortran interface to the Tcl ARE regex engine.
+! tcl_frx -- Modern Fortran interface to the Tcl ARE regex engine.
 !
 ! The C layer (tclInterface.c) works with 0-based, exclusive-end byte
 ! offsets.  The Fortran wrappers convert to 1-based inclusive indices so
@@ -8,7 +8,7 @@
 !
 ! Written by Claude 4.6, reviewed and approved by S Geard, 10/04/2026
 
-module reInterface
+module tcl_frx
     use iso_c_binding, only: c_int, c_char, c_null_char
     implicit none
     private
@@ -39,6 +39,8 @@ module reInterface
         procedure, public :: n_matches => n_matches_regex_t
         procedure, public :: get_match => get_match_regex_t
         procedure, public :: delete    => delete_regex_t
+        procedure         :: assign_regex_t
+        generic           :: assignment(=) => assign_regex_t
         final             :: close_regex_t
     end type regex_t
 
@@ -100,6 +102,11 @@ module reInterface
     ! Separate module procedure declarations (bodies in tclInterface_sm.f90)
     ! ----------------------------------------------------------------
     interface
+        module subroutine assign_regex_t(lhs, rhs)
+            class(regex_t), intent(out) :: lhs
+            class(regex_t), intent(in)  :: rhs
+        end subroutine
+
         module subroutine close_regex_t(this)
             type(regex_t), intent(inout) :: this
         end subroutine
@@ -166,4 +173,4 @@ module reInterface
     public :: tcl_re_delete_f
     public :: tcl_re_reset_c
 
-end module reInterface
+end module tcl_frx

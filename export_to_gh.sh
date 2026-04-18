@@ -9,4 +9,4 @@ git commit -m "Initial commit: Fortran interface to Tcl ARE regex engine"
 git push
 
 rm -rf $tmpdir
-
+exit 0
