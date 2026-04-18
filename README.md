@@ -6,6 +6,7 @@ The full interface should be read from the code
 
 which defines all the hooks provided including the flags.
 Flags should be combined with IOR.
+To avoid memory management work copying (assignment) is a runtime error.
 
 ## Example
 See example.f90 for usage.
