@@ -99,7 +99,7 @@ module tcl_frx
     end interface
 
     ! ----------------------------------------------------------------
-    ! Separate module procedure declarations (bodies in tclInterface_sm.f90)
+    ! Module procedure declarations (implementation in tcl_frx_sm.f90)
     ! ----------------------------------------------------------------
     interface
         module subroutine assign_regex_t(lhs, rhs)
