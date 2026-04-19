@@ -29,6 +29,42 @@ ifdef intel
         FOPTS    += -D_DEBUG -O0 -g -check bounds -warn all -traceback -debug-parameters used
     endif
     LINK_OPTS := -static-intel
+else ifdef flang
+    ODIR  := obj_flang$(OBJ_DIR_SUFF)
+    CC    := gcc
+    FC    := flang
+    RE_COPTS := -I re_engine -I utf8proc -DUTF8PROC_STATIC -fPIC
+    COPTS    := $(RE_COPTS) -Wall
+    FOPTS    := -cpp -fimplicit-none -module-dir $(ODIR) -I$(ODIR)
+    ifdef release
+        RE_COPTS += -O2
+        COPTS    += -O2
+        FOPTS    += -O3
+    else
+        RE_COPTS += -g
+        COPTS    += -g
+        FOPTS    += -D_DEBUG -O0 -g
+    endif
+    # local flang install doesn't know the system gcc runtime path
+    LINK_OPTS := -L/usr/lib/gcc/x86_64-mageia-linux/12
+else ifdef lfortran
+    ODIR  := obj_lfortran$(OBJ_DIR_SUFF)
+    CC    := gcc
+    FC    := lfortran
+    RE_COPTS := -I re_engine -I utf8proc -DUTF8PROC_STATIC -fPIC
+    COPTS    := $(RE_COPTS) -Wall
+    FOPTS    := --cpp -J $(ODIR) -I$(ODIR)
+    ifdef release
+        RE_COPTS += -O2
+        COPTS    += -O2
+        FOPTS    += -O2
+    else
+        RE_COPTS += -g
+        COPTS    += -g
+        FOPTS    += -g --array-bounds-checking
+    endif
+    # lfortran invokes clang as linker; point it at system gcc runtime
+    LINK_OPTS := -L/usr/lib/gcc/x86_64-mageia-linux/12
 else
     ODIR  := obj_gfortran$(OBJ_DIR_SUFF)
     CC    := gcc
@@ -72,13 +108,18 @@ LIB      := $(ODIR)/libtclInterface.a
 # -----------------------------------------------------------------------
 # Targets
 # -----------------------------------------------------------------------
-all: $(ODIR) re_utest_f
+EXE      := $(ODIR)/re_utest_f
+EXAMPLE  := $(ODIR)/example
 
-re_utest_f: re_utest.f90 $(LIB)
+all: $(ODIR) $(EXE)
+
+$(EXE): re_utest.f90 $(LIB)
 	$(FC) $(FOPTS) -o $@ re_utest.f90 $(LIB) $(LINK_OPTS) -lpthread -lm -ldl
+	@echo "$@ created"
 
-example: example.f90 $(LIB)
+$(EXAMPLE): example.f90 $(LIB)
 	$(FC) $(FOPTS) -o $@ example.f90 $(LIB) $(LINK_OPTS) -lpthread -lm -ldl
+	@echo "$@ created"
 
 $(LIB): $(C_OBJS) $(F_OBJ) $(F_SM_OBJ)
 	ar rcv $@ $^
@@ -102,13 +143,13 @@ $(ODIR):
 	mkdir -p $(ODIR)
 
 clean:
-	@$(RM) -vr $(ODIR) re_utest_f example *.mod
+	@$(RM) -vr $(ODIR)
 
 veryclean: clean
 	@$(RM) -rvf obj_*
 
 help:
-	@echo "Usage:  make [intel=t] [release=t]"
+	@echo "Usage:  make [intel=t] [flang=t] [lfortran=t] [release=t]"
 	@echo "ODIR      = $(ODIR)"
 	@echo "CC        = $(CC)   COPTS = $(COPTS)"
 	@echo "FC        = $(FC)   FOPTS = $(FOPTS)"
