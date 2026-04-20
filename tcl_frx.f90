@@ -33,12 +33,13 @@ module tcl_frx
         integer, private :: mat = 0
         character(len=:), allocatable, private :: txt
     contains
-        procedure, public :: compile   => compile_regex_t
-        procedure, public :: apply     => apply_regex_t
-        procedure, public :: matched   => matched_regex_t   ! .true. if last apply succeeded
-        procedure, public :: n_matches => n_matches_regex_t
-        procedure, public :: get_match => get_match_regex_t
-        procedure, public :: delete    => delete_regex_t
+        procedure, public :: compile     => compile_regex_t
+        procedure, public :: apply       => apply_regex_t
+        procedure, public :: matched     => matched_regex_t   ! .true. if last apply succeeded
+        procedure, public :: n_matches   => n_matches_regex_t
+        procedure, public :: get_match   => get_match_regex_t
+        procedure, public :: delete      => delete_regex_t
+        procedure, public :: is_compiled => is_compiled_regex_t
         procedure         :: assign_regex_t
         generic           :: assignment(=) => assign_regex_t
         final             :: close_regex_t
@@ -139,6 +140,11 @@ module tcl_frx
             integer,        intent(in) :: midx
             character(len=:), allocatable :: res
         end function
+
+        module function is_compiled_regex_t(this) result(res)
+            class(regex_t), intent(in) :: this
+            logical :: res
+        end function is_compiled_regex_t
 
         module subroutine tcl_re_compile_f(pattern, h, flags)
             character(len=*),  intent(in)  :: pattern

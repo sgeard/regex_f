@@ -16,7 +16,7 @@ ifdef intel
     FC    := ifx
     # RE_COPTS: flags for copied third-party C (no -Wall to avoid false positives)
     # COPTS:    flags for our own tclInterface.c (with -Wall)
-    RE_COPTS := -I re_engine -I utf8proc -DUTF8PROC_STATIC
+    RE_COPTS := -I re_engine -I utf8proc -I compat -DUTF8PROC_STATIC
     COPTS    := $(RE_COPTS) -Wall
     FOPTS    := -fPIC -fpp -module $(ODIR) -I$(ODIR) -diag-disable=7712
     ifdef release
@@ -33,7 +33,7 @@ else ifdef flang
     ODIR  := obj_flang$(OBJ_DIR_SUFF)
     CC    := gcc
     FC    := flang
-    RE_COPTS := -I re_engine -I utf8proc -DUTF8PROC_STATIC -fPIC
+    RE_COPTS := -I re_engine -I utf8proc -I compat -DUTF8PROC_STATIC -fPIC
     COPTS    := $(RE_COPTS) -Wall
     FOPTS    := -cpp -fimplicit-none -module-dir $(ODIR) -I$(ODIR)
     ifdef release
@@ -51,7 +51,7 @@ else ifdef lfortran
     ODIR  := obj_lfortran$(OBJ_DIR_SUFF)
     CC    := gcc
     FC    := lfortran
-    RE_COPTS := -I re_engine -I utf8proc -DUTF8PROC_STATIC -fPIC
+    RE_COPTS := -I re_engine -I utf8proc -I compat -DUTF8PROC_STATIC -fPIC
     COPTS    := $(RE_COPTS) -Wall
     FOPTS    := --cpp -J $(ODIR) -I$(ODIR)
     ifdef release
@@ -69,7 +69,7 @@ else
     ODIR  := obj_gfortran$(OBJ_DIR_SUFF)
     CC    := gcc
     FC    := gfortran
-    RE_COPTS := -I re_engine -I utf8proc -DUTF8PROC_STATIC
+    RE_COPTS := -I re_engine -I utf8proc -I compat -DUTF8PROC_STATIC
     COPTS    := $(RE_COPTS) -Wall
     FOPTS    := -fPIC -cpp -std=f2018 -fimplicit-none -ffree-line-length-200 -Wall -Wextra -J$(ODIR) -I$(ODIR)
     ifdef release
@@ -130,7 +130,7 @@ $(F_OBJ): tcl_frx.f90 | $(ODIR)
 $(F_SM_OBJ): tcl_frx_sm.f90 $(F_OBJ)
 	$(FC) $(FOPTS) -c $< -o $@
 
-$(ODIR)/tclInterface.o: tclInterface.c | $(ODIR)
+$(ODIR)/tclInterface.o: compat/tclInterface.c | $(ODIR)
 	$(CC) $(COPTS) -c -o $@ $<
 
 $(RE_OBJS): $(ODIR)/%.o: $(RE_DIR)/%.c | $(ODIR)

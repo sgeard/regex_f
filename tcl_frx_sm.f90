@@ -63,6 +63,10 @@ contains
         end if
     end procedure get_match_regex_t
 
+    module procedure is_compiled_regex_t
+        res = this%h >= 0
+    end procedure is_compiled_regex_t
+
     ! ----------------------------------------------------------------
     ! Functional interface
     ! ----------------------------------------------------------------
