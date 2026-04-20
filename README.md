@@ -23,7 +23,7 @@ The directory structure is suitable for _fpm_ but currently it doesn't support e
 ## Example
 This is example.f90
 
-```fortran
+```f90
 ! Example: extract subgroups from a simple fraction arithmetic expression
 program example
 
