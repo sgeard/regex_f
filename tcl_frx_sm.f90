@@ -67,6 +67,16 @@ contains
         res = this%h >= 0
     end procedure is_compiled_regex_t
 
+    module procedure match_regex_t
+        call this%compile(pattern, flags)
+        if (this%h < 0) then
+            res = .false.
+            return
+        end if
+        call this%apply(text)
+        res = this%matched()
+    end procedure match_regex_t
+
     ! ----------------------------------------------------------------
     ! Functional interface
     ! ----------------------------------------------------------------
