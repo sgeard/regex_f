@@ -2,6 +2,12 @@
 
 tmpdir=./tmp_gh
 git clone git@github.com:sgeard/regex_f.git $tmpdir
+
+# Clear tracked files so moves/deletions in SVN propagate. svn export --force
+# overwrites existing files but does not remove files missing from the export,
+# so without this step 'git add -A' would not see stale paths as deleted.
+( cd $tmpdir && git ls-files -z | xargs -0 rm -f )
+
 svn export --force svn://persephone/projects/tcl_re $tmpdir
 cd $tmpdir
 git add -A

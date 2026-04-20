@@ -16,7 +16,7 @@ ifdef intel
     FC    := ifx
     # RE_COPTS: flags for copied third-party C (no -Wall to avoid false positives)
     # COPTS:    flags for our own tclInterface.c (with -Wall)
-    RE_COPTS := -I re_engine -I utf8proc -I compat -DUTF8PROC_STATIC
+    RE_COPTS := -I src/re_engine -I src/utf8proc -I src/compat -DUTF8PROC_STATIC
     COPTS    := $(RE_COPTS) -Wall
     FOPTS    := -fPIC -fpp -module $(ODIR) -I$(ODIR) -diag-disable=7712
     ifdef release
@@ -33,7 +33,7 @@ else ifdef flang
     ODIR  := obj_flang$(OBJ_DIR_SUFF)
     CC    := gcc
     FC    := flang
-    RE_COPTS := -I re_engine -I utf8proc -I compat -DUTF8PROC_STATIC -fPIC
+    RE_COPTS := -I src/re_engine -I src/utf8proc -I src/compat -DUTF8PROC_STATIC -fPIC
     COPTS    := $(RE_COPTS) -Wall
     FOPTS    := -cpp -fimplicit-none -module-dir $(ODIR) -I$(ODIR)
     ifdef release
@@ -51,7 +51,7 @@ else ifdef lfortran
     ODIR  := obj_lfortran$(OBJ_DIR_SUFF)
     CC    := gcc
     FC    := lfortran
-    RE_COPTS := -I re_engine -I utf8proc -I compat -DUTF8PROC_STATIC -fPIC
+    RE_COPTS := -I src/re_engine -I src/utf8proc -I src/compat -DUTF8PROC_STATIC -fPIC
     COPTS    := $(RE_COPTS) -Wall
     FOPTS    := --cpp -J $(ODIR) -I$(ODIR)
     ifdef release
@@ -69,7 +69,7 @@ else
     ODIR  := obj_gfortran$(OBJ_DIR_SUFF)
     CC    := gcc
     FC    := gfortran
-    RE_COPTS := -I re_engine -I utf8proc -I compat -DUTF8PROC_STATIC
+    RE_COPTS := -I src/re_engine -I src/utf8proc -I src/compat -DUTF8PROC_STATIC
     COPTS    := $(RE_COPTS) -Wall
     FOPTS    := -fPIC -cpp -std=f2018 -fimplicit-none -ffree-line-length-200 -Wall -Wextra -J$(ODIR) -I$(ODIR)
     ifdef release
@@ -87,8 +87,12 @@ endif
 # -----------------------------------------------------------------------
 # Sources and objects
 # -----------------------------------------------------------------------
-RE_DIR  := re_engine
-UTF_DIR := utf8proc
+SRC_DIR := src
+RE_DIR  := $(SRC_DIR)/re_engine
+UTF_DIR := $(SRC_DIR)/utf8proc
+CMP_DIR := $(SRC_DIR)/compat
+TST_DIR := test
+EX_DIR  := example
 
 # RE engine: only these four need compiling; they #include the rest
 # (regc_*.c, rege_*.c) via unity-build.
@@ -115,24 +119,24 @@ all: $(ODIR) $(EXE)
 
 example: $(EXAMPLE)
 
-$(EXE): re_utest.f90 $(LIB)
-	$(FC) $(FOPTS) -o $@ re_utest.f90 $(LIB) $(LINK_OPTS) -lpthread -lm -ldl
+$(EXE): $(TST_DIR)/re_utest.f90 $(LIB)
+	$(FC) $(FOPTS) -o $@ $< $(LIB) $(LINK_OPTS) -lpthread -lm -ldl
 	@echo "$@ created"
 
-$(EXAMPLE): example.f90 $(LIB)
-	$(FC) $(FOPTS) -o $@ example.f90 $(LIB) $(LINK_OPTS) -lpthread -lm -ldl
+$(EXAMPLE): $(EX_DIR)/example.f90 $(LIB)
+	$(FC) $(FOPTS) -o $@ $< $(LIB) $(LINK_OPTS) -lpthread -lm -ldl
 	@echo "$@ created"
 
 $(LIB): $(C_OBJS) $(F_OBJ) $(F_SM_OBJ)
 	ar rcv $@ $^
 
-$(F_OBJ): tcl_frx.f90 | $(ODIR)
+$(F_OBJ): $(SRC_DIR)/tcl_frx.f90 | $(ODIR)
 	$(FC) $(FOPTS) -c $< -o $@
 
-$(F_SM_OBJ): tcl_frx_sm.f90 $(F_OBJ)
+$(F_SM_OBJ): $(SRC_DIR)/tcl_frx_sm.f90 $(F_OBJ)
 	$(FC) $(FOPTS) -c $< -o $@
 
-$(ODIR)/tclInterface.o: compat/tclInterface.c | $(ODIR)
+$(ODIR)/tclInterface.o: $(CMP_DIR)/tclInterface.c | $(ODIR)
 	$(CC) $(COPTS) -c -o $@ $<
 
 $(RE_OBJS): $(ODIR)/%.o: $(RE_DIR)/%.c | $(ODIR)
