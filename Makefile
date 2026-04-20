@@ -1,4 +1,4 @@
-.PHONY: all clean veryclean help
+.PHONY: all clean veryclean help example
 
 # -----------------------------------------------------------------------
 # Compiler and build-mode selection  (mirrors code/ and hp/ projects)
@@ -112,6 +112,8 @@ EXE      := $(ODIR)/re_utest_f
 EXAMPLE  := $(ODIR)/example
 
 all: $(ODIR) $(EXE)
+
+example: $(EXAMPLE)
 
 $(EXE): re_utest.f90 $(LIB)
 	$(FC) $(FOPTS) -o $@ re_utest.f90 $(LIB) $(LINK_OPTS) -lpthread -lm -ldl

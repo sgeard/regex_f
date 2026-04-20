@@ -30,8 +30,9 @@ module tcl_frx
     ! ----------------------------------------------------------------
     type, public :: regex_t
         integer, private :: h   = -1   ! -1 = not compiled; >= 0 valid handle
-        integer, private :: mat = 0
-        character(len=:), allocatable, private :: txt
+        integer, private :: mat = 0    ! The number of matches found after applying
+                                       ! the compiled rx to txt
+        character(len=:), allocatable, private :: txt ! The text to which this rx has been applied
     contains
         procedure, public :: compile     => compile_regex_t
         procedure, public :: apply       => apply_regex_t
