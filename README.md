@@ -38,9 +38,15 @@ program example
     character(len=1)  :: op
     character(len=:), allocatable :: str
 
+    ! Compile the rx - this is essential. The string is passed to the internal engine
+    ! where it is compiled and stored internally (accessible by a handle).
     call rx%compile(pat)
+
+    ! Use the compiled rx on the given text. The same rx can be used for diffetent text,
+    ! no need to recompile unless the rx pattern has changed.
     call rx%apply(line)
 
+    ! Check for matches, whether there are ny and if so how many
     if (.not. rx%matched()) then
         stop '*** Match failed'
     end if
@@ -48,6 +54,7 @@ program example
         stop '*** Incorrect match'
     end if
 
+    ! Retrieve all the matches. 0 is a valid index and alwasy returns the whole input string
     j = 1
     do i=1,rx%n_matches()
         str = rx%get_match(i)
